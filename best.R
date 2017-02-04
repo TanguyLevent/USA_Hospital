@@ -1,10 +1,11 @@
 best <- function(state, outcome) {
         
+        options(warn = -1)
         ## Read outcome data
-        my_data <<- read.csv("outcome-of-care-measures.csv", colClasses="character")
+        my_data <- read.csv("outcome-of-care-measures.csv", colClasses="character")
         
-        s <<- my_data$State
-        m <<- c("heart attack","heart failure", "pneumonia")
+        s <- my_data$State
+        m <- c("heart attack","heart failure", "pneumonia")
         ## Check that state and outcome are valid
         
         if (!any(s==state))  stop("invalid state")
@@ -15,12 +16,15 @@ best <- function(state, outcome) {
         if (outcome == m[[1]]) c <- 11
         else if (outcome == m[[2]]) c <- 17
         else c <- 23
+
+        my_data <- my_data[my_data$State == state,]
+        my_data[,c] <- as.numeric(my_data[,c])
+        my_data <- my_data[complete.cases(my_data),]
+        my_data <- my_data[order(my_data[,c], my_data[,2]),]
+        result <- my_data[1,2]
         
-        my_data <- subset(my_data, s == state & my_data[,c] != "Not Available")
-        r <- rank(as.numeric(my_data[,c]))
-        result <- which.min(r)
+        message("The best hospital for the ", outcome ," mortality is : ", result)
         
-        message("The best hospital for the ", outcome ," mortality is : ", my_data[result,2])
-      
+        options(warn = 0)
 }
 
